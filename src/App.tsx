@@ -1,121 +1,106 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  
+  
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
 
+    if (!file) return
+
+    setSelectedFile(file)
+
+    const url = URL.createObjectURL(file)
+    setPreviewUrl(url)
+  }
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="app">
+      <nav className="navbar">
+        <div className="logo">
+          Arch<span>AI</span>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+        <div className="nav-links">
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How it works</a>
+          <button className="login-button">Login</button>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      </nav>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      <main>
+        <section className="hero">
+          <div className="hero-content">
+            <p className="tagline">AI-POWERED ARCHITECTURAL VISUALIZATION</p>
+
+            <h1>
+              Turn Floor Plans Into
+              <span> Stunning 3D Spaces</span>
+            </h1>
+
+            <p className="description">
+              Upload your 2D floor plan and let AI transform it into a
+              photorealistic architectural visualization in minutes.
+            </p>
+
+            <button className="primary-button">
+              Start Creating →
+            </button>
+          </div>
+
+          <div className="upload-card">
+            <div className="upload-icon">📐</div>
+
+            <h2>Upload Your Floor Plan</h2>
+
+            <p>
+              Drag and drop your floor plan here, or choose a file from
+              your computer.
+            </p>
+
+            <label className="upload-button">
+             Choose Floor Plan
+             <input
+               type="file"
+               accept="image/png,image/jpeg,image/webp"
+               onChange={handleFileChange}
+               hidden
+             />
+           </label>
+
+            <small>PNG, JPG or WEBP • Max 10MB</small>
+            {previewUrl && (
+             <div className="preview">
+              <img src={previewUrl} alt="Uploaded floor plan" />
+
+              <p>
+                Selected: <strong>{selectedFile?.name}</strong>
+              </p>
+             </div>
+            )}
+          </div>
+        </section>
+
+        <section className="features" id="features">
+          <div>
+            <h3>🤖 AI Powered</h3>
+            <p>Analyze architectural layouts and generate visualizations.</p>
+          </div>
+
+          <div>
+            <h3>⚡ Fast Generation</h3>
+            <p>Turn your ideas into visual concepts quickly.</p>
+          </div>
+
+          <div>
+            <h3>☁️ Cloud Projects</h3>
+            <p>Save and access your architectural projects anywhere.</p>
+          </div>
+        </section>
+      </main>
+    </div>
   )
 }
 
