@@ -215,3 +215,18 @@ button {
   margin: 10px 0 0;
   font-size: 14px;
 }
+
+.generate-button {
+  margin-top: 15px;
+  padding: 13px 22px;
+  border: none;
+  border-radius: 6px;
+  background: #222;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.generate-button:hover {
+  opacity: 0.85;
+}

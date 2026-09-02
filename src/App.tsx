@@ -70,15 +70,18 @@ function App() {
              />
            </label>
 
-            <small>PNG, JPG or WEBP • Max 10MB</small>
-            {previewUrl && (
+           {previewUrl && (
              <div className="preview">
-              <img src={previewUrl} alt="Uploaded floor plan" />
+               <img src={previewUrl} alt="Uploaded floor plan" />
 
-              <p>
-                Selected: <strong>{selectedFile?.name}</strong>
-              </p>
-             </div>
+               <p>
+                 Selected: <strong>{selectedFile?.name}</strong>
+                </p>
+
+                <button className="generate-button">
+                 Generate 3D Visualization ✨
+                 </button>
+              </div>
             )}
           </div>
         </section>
@@ -105,3 +108,4 @@ function App() {
 }
 
 export default App
+
