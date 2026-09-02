@@ -4,9 +4,11 @@ import './App.css'
 function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-  
-  
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const [isGenerating, setIsGenerating] = useState(false)
+
+  const handleFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0]
 
     if (!file) return
@@ -15,7 +17,15 @@ function App() {
 
     const url = URL.createObjectURL(file)
     setPreviewUrl(url)
+
+    // Reset the generation button when a new file is selected
+    setIsGenerating(false)
   }
+
+  const handleGenerate = () => {
+    setIsGenerating(true)
+  }
+
   return (
     <div className="app">
       <nav className="navbar">
@@ -33,7 +43,9 @@ function App() {
       <main>
         <section className="hero">
           <div className="hero-content">
-            <p className="tagline">AI-POWERED ARCHITECTURAL VISUALIZATION</p>
+            <p className="tagline">
+              AI-POWERED ARCHITECTURAL VISUALIZATION
+            </p>
 
             <h1>
               Turn Floor Plans Into
@@ -61,26 +73,38 @@ function App() {
             </p>
 
             <label className="upload-button">
-             Choose Floor Plan
-             <input
-               type="file"
-               accept="image/png,image/jpeg,image/webp"
-               onChange={handleFileChange}
-               hidden
-             />
-           </label>
+              Choose Floor Plan
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                onChange={handleFileChange}
+                hidden
+              />
+            </label>
 
-           {previewUrl && (
-             <div className="preview">
-               <img src={previewUrl} alt="Uploaded floor plan" />
+            <small>PNG, JPG or WEBP • Max 10MB</small>
 
-               <p>
-                 Selected: <strong>{selectedFile?.name}</strong>
+            {previewUrl && (
+              <div className="preview">
+                <img
+                  src={previewUrl}
+                  alt="Uploaded floor plan"
+                />
+
+                <p>
+                  Selected:{' '}
+                  <strong>{selectedFile?.name}</strong>
                 </p>
 
-                <button className="generate-button">
-                 Generate 3D Visualization ✨
-                 </button>
+                <button
+                  className="generate-button"
+                  onClick={handleGenerate}
+                  disabled={isGenerating}
+                >
+                  {isGenerating
+                    ? 'Analyzing Floor Plan...'
+                    : 'Generate 3D Visualization ✨'}
+                </button>
               </div>
             )}
           </div>
@@ -89,17 +113,23 @@ function App() {
         <section className="features" id="features">
           <div>
             <h3>🤖 AI Powered</h3>
-            <p>Analyze architectural layouts and generate visualizations.</p>
+            <p>
+              Analyze architectural layouts and generate visualizations.
+            </p>
           </div>
 
           <div>
             <h3>⚡ Fast Generation</h3>
-            <p>Turn your ideas into visual concepts quickly.</p>
+            <p>
+              Turn your ideas into visual concepts quickly.
+            </p>
           </div>
 
           <div>
             <h3>☁️ Cloud Projects</h3>
-            <p>Save and access your architectural projects anywhere.</p>
+            <p>
+              Save and access your architectural projects anywhere.
+            </p>
           </div>
         </section>
       </main>
@@ -108,4 +138,3 @@ function App() {
 }
 
 export default App
-
