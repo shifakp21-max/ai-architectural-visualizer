@@ -18,7 +18,7 @@ app.get('/', (_req, res) => {
   })
 })
 
-app.post('/api/generate', upload.single('floorPlan'), (req, res) => {
+app.post('/api/generate', upload.single('floorPlan'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({
       error: 'No floor plan uploaded.',
@@ -27,10 +27,19 @@ app.post('/api/generate', upload.single('floorPlan'), (req, res) => {
 
   console.log('Received floor plan:', req.file.originalname)
 
+  // Simulate AI processing
+  await new Promise((resolve) => setTimeout(resolve, 3000))
+
   res.json({
     success: true,
-    message: 'Floor plan received successfully!',
+    message: 'AI analysis completed successfully!',
     fileName: req.file.originalname,
+    analysis: {
+      roomsDetected: 4,
+      estimatedArea: '1200 sq ft',
+      style: 'Modern',
+      visualizationStatus: 'Ready',
+    },
   })
 })
 
