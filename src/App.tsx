@@ -22,9 +22,29 @@ function App() {
     setIsGenerating(false)
   }
 
-  const handleGenerate = () => {
-    setIsGenerating(true)
-  }
+    const handleGenerate = async () => {
+      if (!selectedFile) return
+
+      setIsGenerating(true)
+
+      const formData = new FormData()
+      formData.append('floorPlan', selectedFile)
+
+      try {
+        const response = await fetch('http://localhost:5000/api/generate', {
+         method: 'POST',
+         body: formData,
+        })
+
+        const data = await response.json()
+
+        console.log(data)
+      } catch (error) {
+        console.error('Generation failed:', error)
+      } finally {
+        setIsGenerating(false)
+      }
+    }
 
   return (
     <div className="app">
