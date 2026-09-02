@@ -1,5 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
+
+type Project = {
+  id: number
+  name: string
+  fileName: string
+  roomsDetected: number
+  estimatedArea: string
+  style: string
+}
 
 function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -7,12 +16,23 @@ function App() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [showLogin, setShowLogin] = useState(false)
 
+  const [projects, setProjects] = useState<Project[]>([])
+
   const [analysis, setAnalysis] = useState<{
     roomsDetected: number
     estimatedArea: string
     style: string
     visualizationStatus: string
   } | null>(null)
+
+  // Load saved projects when the app starts
+  useEffect(() => {
+    const savedProjects = localStorage.getItem('archai-projects')
+
+    if (savedProjects) {
+      setProjects(JSON.parse(savedProjects))
+    }
+  }, [])
 
   const handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -49,34 +69,67 @@ function App() {
 
       if (data.success) {
         setAnalysis(data.analysis)
+
+        // Create a new project
+        const newProject: Project = {
+          id: Date.now(),
+          name: selectedFile.name.replace(/\.[^/.]+$/, ''),
+          fileName: selectedFile.name,
+          roomsDetected: data.analysis.roomsDetected,
+          estimatedArea: data.analysis.estimatedArea,
+          style: data.analysis.style,
+        }
+
+        // Add project to the existing projects
+        setProjects((currentProjects) => {
+          const updatedProjects = [
+            newProject,
+            ...currentProjects,
+          ]
+
+          // Save projects to browser storage
+          localStorage.setItem(
+            'archai-projects',
+            JSON.stringify(updatedProjects)
+          )
+
+          return updatedProjects
+        })
       }
     } catch (error) {
       console.error('Generation failed:', error)
+
       alert('Unable to connect to the backend.')
     } finally {
       setIsGenerating(false)
     }
   }
 
+  const handleDeleteProject = (id: number) => {
+    const updatedProjects = projects.filter(
+      (project) => project.id !== id
+    )
+
+    setProjects(updatedProjects)
+
+    localStorage.setItem(
+      'archai-projects',
+      JSON.stringify(updatedProjects)
+    )
+  }
+
   return (
     <div className="app">
 
-      {/* NAVBAR */}
+      {/* NAVIGATION */}
       <nav className="navbar">
-
         <div className="logo">
           Arch<span>AI</span>
         </div>
 
         <div className="nav-links">
-
-          <a href="#features">
-            Features
-          </a>
-
-          <a href="#how-it-works">
-            How it works
-          </a>
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How it works</a>
 
           <button
             className="login-button"
@@ -84,15 +137,12 @@ function App() {
           >
             Login
           </button>
-
         </div>
-
       </nav>
 
-      {/* MAIN */}
       <main>
 
-        {/* HERO */}
+        {/* HERO SECTION */}
         <section className="hero">
 
           <div className="hero-content">
@@ -103,15 +153,13 @@ function App() {
 
             <h1 className="main-heading">
               Turn Floor Plans Into
-              <span>
-                Stunning 3D Spaces
-              </span>
+              <span>Stunning 3D Spaces</span>
             </h1>
 
             <p className="description">
               Upload your 2D floor plan and let AI transform
-              your architectural ideas into beautiful
-              visual concepts in minutes.
+              your architectural ideas into beautiful visual
+              concepts in minutes.
             </p>
 
             <div className="hero-buttons">
@@ -126,8 +174,7 @@ function App() {
                     })
                 }
               >
-                Start Creating
-                <span>→</span>
+                Start Creating <span>→</span>
               </button>
 
               <a
@@ -160,6 +207,7 @@ function App() {
 
           </div>
 
+
           {/* UPLOAD CARD */}
           <div
             className="upload-card"
@@ -184,10 +232,12 @@ function App() {
 
             </div>
 
+
             <p className="upload-description">
               Upload a clear image of your architectural
               floor plan and let ArchAI analyze the layout.
             </p>
+
 
             <label className="upload-area">
 
@@ -212,11 +262,14 @@ function App() {
 
             </label>
 
+
             {/* PREVIEW */}
             {previewUrl && (
+
               <div className="preview">
 
                 <div className="preview-header">
+
                   <span>
                     Floor Plan Preview
                   </span>
@@ -224,6 +277,7 @@ function App() {
                   <span className="file-status">
                     ✓ Uploaded
                   </span>
+
                 </div>
 
                 <img
@@ -234,6 +288,7 @@ function App() {
                 <p className="selected-file">
                   {selectedFile?.name}
                 </p>
+
 
                 <button
                   className="generate-button"
@@ -246,18 +301,23 @@ function App() {
                 </button>
 
               </div>
+
             )}
+
 
             {/* AI ANALYSIS */}
             {analysis && (
+
               <div className="analysis-card">
 
                 <div className="result-heading">
+
                   <div className="success-icon">
                     ✓
                   </div>
 
                   <div>
+
                     <span>
                       STEP 02
                     </span>
@@ -265,38 +325,63 @@ function App() {
                     <h2>
                       AI Analysis Complete
                     </h2>
+
                   </div>
+
                 </div>
+
 
                 <div className="analysis-grid">
 
                   <div className="analysis-item">
+
                     <span>🏠</span>
-                    <small>Rooms detected</small>
+
+                    <small>
+                      Rooms detected
+                    </small>
+
                     <strong>
                       {analysis.roomsDetected}
                     </strong>
+
                   </div>
 
+
                   <div className="analysis-item">
+
                     <span>📐</span>
-                    <small>Estimated area</small>
+
+                    <small>
+                      Estimated area
+                    </small>
+
                     <strong>
                       {analysis.estimatedArea}
                     </strong>
+
                   </div>
 
+
                   <div className="analysis-item">
+
                     <span>🎨</span>
-                    <small>Design style</small>
+
+                    <small>
+                      Design style
+                    </small>
+
                     <strong>
                       {analysis.style}
                     </strong>
+
                   </div>
 
                 </div>
 
+
                 <div className="status-bar">
+
                   <span>
                     Visualization status
                   </span>
@@ -304,13 +389,17 @@ function App() {
                   <strong>
                     ✓ {analysis.visualizationStatus}
                   </strong>
+
                 </div>
 
               </div>
+
             )}
+
 
             {/* VISUALIZATION */}
             {analysis && (
+
               <div className="visualization-card">
 
                 <div className="visualization-content">
@@ -342,11 +431,135 @@ function App() {
                 </div>
 
               </div>
+
             )}
 
           </div>
 
         </section>
+
+
+        {/* PROJECT HISTORY */}
+        <section
+          className="projects-section"
+          id="projects"
+        >
+
+          <div className="section-heading">
+
+            <span>
+              YOUR WORK
+            </span>
+
+            <h2>
+              Project <em>History.</em>
+            </h2>
+
+          </div>
+
+
+          {projects.length === 0 ? (
+
+            <div className="empty-projects">
+
+              <div className="empty-icon">
+                ◇
+              </div>
+
+              <h3>
+                No projects yet
+              </h3>
+
+              <p>
+                Upload a floor plan and generate your
+                first visualization to see it here.
+              </p>
+
+            </div>
+
+          ) : (
+
+            <div className="projects-grid">
+
+              {projects.map((project) => (
+
+                <div
+                  className="project-card"
+                  key={project.id}
+                >
+
+                  <div className="project-card-top">
+
+                    <div className="project-icon">
+                      🏠
+                    </div>
+
+                    <button
+                      className="delete-project"
+                      onClick={() =>
+                        handleDeleteProject(project.id)
+                      }
+                      title="Delete project"
+                    >
+                      ×
+                    </button>
+
+                  </div>
+
+
+                  <h3>
+                    {project.name}
+                  </h3>
+
+                  <p className="project-file">
+                    {project.fileName}
+                  </p>
+
+
+                  <div className="project-details">
+
+                    <div>
+                      <span>
+                        Rooms
+                      </span>
+
+                      <strong>
+                        {project.roomsDetected}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        Area
+                      </span>
+
+                      <strong>
+                        {project.estimatedArea}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        Style
+                      </span>
+
+                      <strong>
+                        {project.style}
+                      </strong>
+                    </div>
+
+                  </div>
+
+                </div>
+
+              ))}
+
+            </div>
+
+          )}
+
+        </section>
+
 
         {/* FEATURES */}
         <section
@@ -367,6 +580,7 @@ function App() {
 
           </div>
 
+
           <div className="feature-grid">
 
             <div className="feature-card">
@@ -380,11 +594,12 @@ function App() {
               </h3>
 
               <p>
-                Analyze architectural layouts and
-                create intelligent visual concepts.
+                Analyze architectural layouts and create
+                intelligent visual concepts.
               </p>
 
             </div>
+
 
             <div className="feature-card">
 
@@ -397,11 +612,12 @@ function App() {
               </h3>
 
               <p>
-                Transform your floor plans into
-                visual concepts quickly.
+                Transform your floor plans into visual
+                concepts quickly.
               </p>
 
             </div>
+
 
             <div className="feature-card">
 
@@ -414,8 +630,8 @@ function App() {
               </h3>
 
               <p>
-                Save your architectural projects
-                and access them from anywhere.
+                Save your architectural projects and
+                access them from anywhere.
               </p>
 
             </div>
@@ -426,8 +642,10 @@ function App() {
 
       </main>
 
+
       {/* LOGIN MODAL */}
       {showLogin && (
+
         <div
           className="login-overlay"
           onClick={() => setShowLogin(false)}
@@ -442,12 +660,11 @@ function App() {
 
             <button
               className="close-login"
-              onClick={() =>
-                setShowLogin(false)
-              }
+              onClick={() => setShowLogin(false)}
             >
               ×
             </button>
+
 
             <div className="login-logo">
               Arch<span>AI</span>
@@ -466,6 +683,7 @@ function App() {
               and visualizations.
             </p>
 
+
             <label>
               Email
             </label>
@@ -475,6 +693,7 @@ function App() {
               placeholder="Enter your email"
             />
 
+
             <label>
               Password
             </label>
@@ -483,6 +702,7 @@ function App() {
               type="password"
               placeholder="Enter your password"
             />
+
 
             <button
               className="login-submit"
@@ -495,7 +715,9 @@ function App() {
               Sign In →
             </button>
 
+
             <p className="signup-text">
+
               Don't have an account?{' '}
 
               <button
@@ -508,11 +730,13 @@ function App() {
               >
                 Create one
               </button>
+
             </p>
 
           </div>
 
         </div>
+
       )}
 
     </div>
